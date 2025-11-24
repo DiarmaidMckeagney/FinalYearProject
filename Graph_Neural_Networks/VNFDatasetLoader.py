@@ -1,5 +1,5 @@
 from multiprocessing import Pool
-from torch_geometric.data import HeteroData
+# from torch_geometric.data import HeteroData
 import os
 from collections import defaultdict
 from typing import Dict
@@ -42,19 +42,19 @@ def extract_node_types(filepath):
             row_data = {col: headerlessRow[col] for col in cols_sorted}
             node_types[node_name].append(row_data)
 
-    return node_types
+    return node_types.keys()
 
 
 
 
 # Example usage:
 filepaths_to_use = getFilePaths()  # or your list of 32 CSV paths
-nested_dict_for_multiprocessing = list
+nested_dict_for_multiprocessing = []
 
 with Pool(8) as p:
     nested_dict_for_multiprocessing.append(p.map(extract_node_types, filepaths_to_use))
+    print(nested_dict_for_multiprocessing)
 
-print(nested_dict_for_multiprocessing)
 
 
 
