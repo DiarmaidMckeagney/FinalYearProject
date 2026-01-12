@@ -13,21 +13,10 @@ if __name__ == "__main__":
     files = VNFDatasetLoader.getFilePaths()
     dataset = pandas.read_csv(files[0], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
 
-    featureArray = []
-    for i in range(len(dataset.columns)):
-        featureArray.append(0)
-    for index, row in dataset.iterrows():
-        for i in range(len(dataset.columns)):
-            if pd.notna(row.iloc[i]):
-                featureArray[i] = featureArray[i] + 1
+    dataset = dataset.dropna(axis=1)
+    print(dataset.head())
+    print(dataset.shape)
 
-    print(featureArray)
-    print(dataset.shape[0])
-    for i in range(len(dataset.columns)):
-        if featureArray[i] != dataset.shape[0]:
-            print("hello world")
-    #
-    # print(dataset.iloc[0])
     # encoder = OneHotEncoder(sparse_output=False)
     #
     # df = pd.DataFrame(filled_in_dataset, columns=filled_in_dataset[0])
