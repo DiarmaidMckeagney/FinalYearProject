@@ -1,23 +1,19 @@
-import csv
-# from json.decoder import NaN
-
-import numpy as np
-import pandas
 import pandas as pd
 from sklearn.ensemble import IsolationForest
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import VNFDatasetLoader
 
 if __name__ == "__main__":
     files = VNFDatasetLoader.getFilePaths()
-    dataset = pandas.read_csv(files[0], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
+    dataset = pd.read_csv(files[0], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
 
     dataset = dataset.dropna(axis=1)
-    print(dataset.head())
     print(dataset.shape)
+    print(dataset.dtypes)
+    oneHotEncoder = OneHotEncoder(sparse_output=False)
+    labelEncoder = LabelEncoder()
 
-    # encoder = OneHotEncoder(sparse_output=False)
+
     #
     # df = pd.DataFrame(filled_in_dataset, columns=filled_in_dataset[0])
     # categorical_columns = df.select_dtypes(include=['object']).columns.tolist()
