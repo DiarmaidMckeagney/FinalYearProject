@@ -1,6 +1,8 @@
 import csv
+# from json.decoder import NaN
 
 import numpy as np
+import pandas
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.impute import SimpleImputer
@@ -9,26 +11,23 @@ import VNFDatasetLoader
 
 if __name__ == "__main__":
     files = VNFDatasetLoader.getFilePaths()
-    dataset = []
-    isHeader = True
-    with open(files[0], newline='', encoding='utf-8') as f:
-        csv_reader = csv.reader(f)
-        next(csv_reader) # skipping header
-        for row in csv_reader:
-            dataset.append(row)
-
-    print(len(dataset[0]))
+    dataset = pandas.read_csv(files[0], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
 
     featureArray = []
-    for i in range(len(dataset[0])):
+    for i in range(len(dataset.columns)):
         featureArray.append(0)
-    for row in dataset:
-        for i in range(len(row)):
-            if row[i] != "":
+    for index, row in dataset.iterrows():
+        for i in range(len(dataset.columns)):
+            if pd.notna(row.iloc[i]):
                 featureArray[i] = featureArray[i] + 1
 
     print(featureArray)
-
+    print(dataset.shape[0])
+    for i in range(len(dataset.columns)):
+        if featureArray[i] != dataset.shape[0]:
+            print("hello world")
+    #
+    # print(dataset.iloc[0])
     # encoder = OneHotEncoder(sparse_output=False)
     #
     # df = pd.DataFrame(filled_in_dataset, columns=filled_in_dataset[0])
