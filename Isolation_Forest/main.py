@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import LabelEncoder
 import VNFDatasetLoader
 
 if __name__ == "__main__":
@@ -8,12 +8,14 @@ if __name__ == "__main__":
     dataset = pd.read_csv(files[0], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
 
     dataset = dataset.dropna(axis=1)
-    print(dataset.shape)
-    print(dataset.dtypes)
-    oneHotEncoder = OneHotEncoder(sparse_output=False)
+    print(dataset.shape[1])
+    datasetLabels = dataset.iloc[:,dataset.shape[1]-1].values
+
     labelEncoder = LabelEncoder()
 
-
+    for datatype in dataset.dtypes.items():
+        if datatype[1] == "object":
+            print(datatype[0])
     #
     # df = pd.DataFrame(filled_in_dataset, columns=filled_in_dataset[0])
     # categorical_columns = df.select_dtypes(include=['object']).columns.tolist()
