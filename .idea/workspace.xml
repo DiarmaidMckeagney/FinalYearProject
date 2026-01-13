@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6fc39212-3af9-4b59-957e-5ea6f0b34681" name="Changes" comment="Turns out there is a way easier method of dropping columns with lots of null values and that is to use dataset = dataset.dropna(axis=1) which is a lot shorter that the 20+ lines of code I had before =).">
+    <list default="true" id="6fc39212-3af9-4b59-957e-5ea6f0b34681" name="Changes" comment="taking out the labels from the dataset">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Isolation_Forest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Isolation_Forest/main.py" afterDir="false" />
     </list>
@@ -50,7 +50,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.PreProccessData.executor": "Run",
-    "Python.main (1).executor": "Run",
+    "Python.main (1).executor": "Debug",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -184,7 +184,8 @@
       <workItem from="1763561399150" duration="2670000" />
       <workItem from="1763901322846" duration="1782000" />
       <workItem from="1763904410283" duration="807000" />
-      <workItem from="1768218185258" duration="9339000" />
+      <workItem from="1768218185258" duration="9949000" />
+      <workItem from="1768307198733" duration="2204000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit that Adds the intial files">
       <option name="closed" value="true" />
@@ -266,7 +267,31 @@
       <option name="project" value="LOCAL" />
       <updated>1768226197961</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Starting work on encoding the couple of non-numeric columns.">
+      <option name="closed" value="true" />
+      <created>1768228646640</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1768228646640</updated>
+    </task>
+    <task id="LOCAL-00012" summary="updating readme with new project title.">
+      <option name="closed" value="true" />
+      <created>1768228913437</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1768228913437</updated>
+    </task>
+    <task id="LOCAL-00013" summary="taking out the labels from the dataset">
+      <option name="closed" value="true" />
+      <created>1768307767116</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1768307767116</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -293,12 +318,26 @@
     <MESSAGE value="Removing a lot of old code and redesigning the ingestion of data into the isolation forest model." />
     <MESSAGE value="So there were a ton of issues with the ingestion so I have changed it to pandas.read_csv as it handles multiple data types easily. I am then counting the number of non-null values in each column and I plan to remove all the columns that have a significant amount of rows with null values." />
     <MESSAGE value="Turns out there is a way easier method of dropping columns with lots of null values and that is to use dataset = dataset.dropna(axis=1) which is a lot shorter that the 20+ lines of code I had before =)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Turns out there is a way easier method of dropping columns with lots of null values and that is to use dataset = dataset.dropna(axis=1) which is a lot shorter that the 20+ lines of code I had before =)." />
+    <MESSAGE value="Starting work on encoding the couple of non-numeric columns." />
+    <MESSAGE value="updating readme with new project title." />
+    <MESSAGE value="taking out the labels from the dataset" />
+    <option name="LAST_COMMIT_MESSAGE" value="taking out the labels from the dataset" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Isolation_Forest/main.py</url>
+          <line>17</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Final_Year_Project1$PreProccessData.coverage" NAME="PreProccessData Coverage Results" MODIFIED="1763475749726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Graph_Neural_Networks" />
     <SUITE FILE_PATH="coverage/Final_Year_Project1$main.coverage" NAME="main Coverage Results" MODIFIED="1762697585524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Graph_Neural_Networks" />
-    <SUITE FILE_PATH="coverage/FinalYearProject$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1768226298829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Isolation_Forest" />
+    <SUITE FILE_PATH="coverage/FinalYearProject$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1768308730840" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Isolation_Forest" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
