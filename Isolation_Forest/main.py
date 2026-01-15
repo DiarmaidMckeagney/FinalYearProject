@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import roc_auc_score
@@ -33,5 +32,22 @@ if __name__ == "__main__":
     print("number of anomalies detected: ", list(predictions).count(-1))
     print("number of 'Benign' predictions: ", list(predictions).count(1))
 
+    #this next section creates a confusion matrix for the results
+    truePositiveCount = 0
+    falsePositiveCount = 0
+    trueNegativeCount = 0
+    falseNegativeCount = 0
+    counter = 0
+    for i in predictions:
+        if testingLabels[counter] == "Benign" and i == 1:
+            truePositiveCount += 1
+        elif testingLabels[counter] == "Benign" and i == -1:
+            falsePositiveCount += 1
+        elif testingLabels[counter] != "Benign" and i == 1:
+            falseNegativeCount += 1
+        else:
+            trueNegativeCount += 1
+        counter += 1
 
-
+    print("confusion matrix:")
+    print(f"{truePositiveCount}\t {falseNegativeCount} \n {falsePositiveCount} \t {trueNegativeCount}")

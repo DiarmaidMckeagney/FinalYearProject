@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6fc39212-3af9-4b59-957e-5ea6f0b34681" name="Changes" comment="This is a basic evaluation of the isolation forest algorithm. Still lots to do in getting full metrics on accuracy">
+    <list default="true" id="6fc39212-3af9-4b59-957e-5ea6f0b34681" name="Changes" comment="Adding comments to make the flow of the code clear">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Isolation_Forest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Isolation_Forest/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNFDatasetLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/VNFDatasetLoader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNF_Dataset/DNS/vDNS/csv/sessions_1_vDNS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/VNF_Dataset/DNS/vDNS/csv/sessions_1_vDNS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNF_Dataset/IDS/vIDS/csv/sessions_1_vIDS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/VNF_Dataset/IDS/vIDS/csv/sessions_1_vIDS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNF_Dataset/Load_Balancer/vLoad_Balancer/csv/sessions_1_vLoad Balancer.csv" beforeDir="false" afterPath="$PROJECT_DIR$/VNF_Dataset/Load_Balancer/vLoad_Balancer/csv/sessions_1_vLoad Balancer.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNF_Dataset/Proxy/vProxy/csv/sessions_1_vProxy.csv" beforeDir="false" afterPath="$PROJECT_DIR$/VNF_Dataset/Proxy/vProxy/csv/sessions_1_vProxy.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VNF_Dataset/Router_Firewall/vRouter_Firewall/csv/sessions_1_vRouter_vFirewall.csv" beforeDir="false" afterPath="$PROJECT_DIR$/VNF_Dataset/Router_Firewall/vRouter_Firewall/csv/sessions_1_vRouter_vFirewall.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +186,7 @@
       <workItem from="1763904410283" duration="807000" />
       <workItem from="1768218185258" duration="9949000" />
       <workItem from="1768307198733" duration="6838000" />
-      <workItem from="1768475279456" duration="6014000" />
+      <workItem from="1768475279456" duration="7967000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit that Adds the intial files">
       <option name="closed" value="true" />
@@ -322,7 +316,23 @@
       <option name="project" value="LOCAL" />
       <updated>1768476569582</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Refactoring the code to separate out the code for getting the training files and importing the data into the VNFDatasetLoader. I found an issue with the Load_Balancer where one of the lines had no values other than a label, so I decided to remove that line.">
+      <option name="closed" value="true" />
+      <created>1768484200262</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1768484200262</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Adding comments to make the flow of the code clear">
+      <option name="closed" value="true" />
+      <created>1768484848937</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1768484848937</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -355,12 +365,14 @@
     <MESSAGE value="getting the non-numeric columsn to be label encoded. I feel this is the best way to encode these columns as they have many different values." />
     <MESSAGE value="I have altered the code to read in the first session of every VNF service. This is because the first sessions only contain benign data. I have concatenated the data together into one training set. This now has a basic flow of an isolation forest run." />
     <MESSAGE value="This is a basic evaluation of the isolation forest algorithm. Still lots to do in getting full metrics on accuracy" />
-    <option name="LAST_COMMIT_MESSAGE" value="This is a basic evaluation of the isolation forest algorithm. Still lots to do in getting full metrics on accuracy" />
+    <MESSAGE value="Refactoring the code to separate out the code for getting the training files and importing the data into the VNFDatasetLoader. I found an issue with the Load_Balancer where one of the lines had no values other than a label, so I decided to remove that line." />
+    <MESSAGE value="Adding comments to make the flow of the code clear" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding comments to make the flow of the code clear" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Final_Year_Project1$PreProccessData.coverage" NAME="PreProccessData Coverage Results" MODIFIED="1763475749726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Graph_Neural_Networks" />
     <SUITE FILE_PATH="coverage/Final_Year_Project1$main.coverage" NAME="main Coverage Results" MODIFIED="1762697585524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Graph_Neural_Networks" />
-    <SUITE FILE_PATH="coverage/FinalYearProject$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1768481161218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Isolation_Forest" />
+    <SUITE FILE_PATH="coverage/FinalYearProject$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1768486276635" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Isolation_Forest" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

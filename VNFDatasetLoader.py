@@ -1,10 +1,9 @@
-
 import os
 import pandas as pd
-dir_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "FinalYearProject/VNF_Dataset")# might be a better solution to this but it works
 
 def getFilePaths():
     # this function gets all the filepaths in the VNF_Dataset folder.
+    dir_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"FinalYearProject/VNF_Dataset")  # might be a better solution to this but it works
     filepaths = []
     for i in [x for x in os.listdir(dir_path)]:
         current_path = os.path.join(dir_path, i, "v" + i, "csv")
