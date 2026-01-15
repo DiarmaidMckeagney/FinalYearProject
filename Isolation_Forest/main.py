@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import IsolationForest
+from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import LabelEncoder
 import VNFDatasetLoader
 
@@ -12,7 +13,6 @@ if __name__ == "__main__":
         file_name_array = file_path_array[len(file_path_array)-1]
         file_name_array = file_name_array.split("_")
         session_number = file_name_array[1]
-        print(session_number)
         if int(session_number) == 1:
             training_files.append(file)
 
@@ -32,9 +32,25 @@ if __name__ == "__main__":
         label_encoder = LabelEncoder()
         fullTrainingDataset[col] = label_encoder.fit_transform(fullTrainingDataset[col].astype(str))
 
-    pd.set_option('display.max_columns', None)
-    print(fullTrainingDataset.head())
-    print(np.unique(datasetLabels,return_counts=True))
-
-    isolationForest = IsolationForest(n_estimators=100,random_state=0)
+    isolationForest = IsolationForest(n_estimators=200, max_features=6, random_state=56)
     isolationForest.fit(fullTrainingDataset)
+    isolationForest.fit(fullTrainingDataset)
+
+    testingdataset = pd.read_csv(files[2], header=0,low_memory=False,encoding="utf-8",on_bad_lines="skip")
+    testingdataset.dropna(axis=0,how='all',inplace=True)
+    testingdataset = testingdataset.dropna(axis=1)
+    testingLabels = testingdataset.iloc[:,testingdataset.shape[1]-1].values
+    testingdataset.drop("Label",axis=1,inplace=True)
+
+    for col in testingdataset.select_dtypes(include=['object']).columns:
+        label_encoder = LabelEncoder()
+        testingdataset[col] = label_encoder.fit_transform(testingdataset[col].astype(str))
+
+    print(np.unique(testingLabels, return_counts=True))
+
+    predictions = isolationForest.predict(testingdataset)
+
+    print(roc_auc_score(testingLabels, predictions))
+    print("number of anomalies detected: ", list(predictions).count(-1))
+    print("number of 'Benign' predictions: ", list(predictions).count(1))
+
