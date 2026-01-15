@@ -38,12 +38,12 @@ if __name__ == "__main__":
     trueNegativeCount = 0
     falseNegativeCount = 0
     counter = 0
-    for i in predictions:
-        if testingLabels[counter] == "Benign" and i == 1:
+    for pred in predictions: # 1 indicates normal and -1 indicates anomaly
+        if testingLabels[counter] == "Benign" and pred == 1:
             truePositiveCount += 1
-        elif testingLabels[counter] == "Benign" and i == -1:
+        elif testingLabels[counter] == "Benign" and pred == -1:
             falsePositiveCount += 1
-        elif testingLabels[counter] != "Benign" and i == 1:
+        elif testingLabels[counter] != "Benign" and pred == 1:
             falseNegativeCount += 1
         else:
             trueNegativeCount += 1
