@@ -36,20 +36,21 @@ def importDatasetFromFiles(filepaths):
         dataset.append(datasetFrame) # add the dataframe to the array of all dataframes
 
     fullDataset = pd.concat(dataset) # this merges all the data from each file into one dataframe
-    fullDataset = fullDataset.dropna(axis=1)# this drops any column that contains null values. I am doing this to ensure only common columns are used in the model.
-    print(fullDataset.shape)
+    numberOfAnomaliesNeeded = round((float(fullDataset.shape[0]) / 95.0) * 5.0)
     datasetLabels = fullDataset.iloc[:, fullDataset.shape[1] - 1].values # separate out the labels
     fullDataset.drop("Label", axis=1, inplace=True) # drop the labels from the dataset
 
-    return fullDataset, datasetLabels # return dataset and labels
+    return fullDataset, datasetLabels, numberOfAnomaliesNeeded # return dataset and labels
 
 def addContamination(filesToUse, filesNotToUse, contaminationAmount):
     contamination = pd.DataFrame() # used to hold the contamination dataframe to be returned
-    random.shuffle(filesToUse)
+    random.shuffle(filesToUse) # shuffling the files to that different anomalies will be added.
 
     for file in filesToUse:
-        if contamination.shape[0] >= contaminationAmount:
-            return contamination
+        if contamination.shape[0] >= contaminationAmount: # if we have enough
+            contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].values  # separate out the labels
+            contamination.drop("Label", axis=1, inplace=True)  # drop the labels from the dataset
+            return contamination, contaminationLabels
 
         if file in filesNotToUse: # we are skipping any files used in the training and testing datasets
             continue
@@ -65,8 +66,10 @@ def addContamination(filesToUse, filesNotToUse, contaminationAmount):
             continue
         contamination = pd.concat([contamination,datasetContamination.iloc[0:amountStillNeeded,:]]) # add the remaining amount of samples needed.
 
-
-    return contamination # If somehow we get to the end of the all the files and still don't have enough, then return what we have
+    # If somehow we get to the end of the all the files and still don't have enough, then return what we have
+    contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].values  # separate out the labels
+    contamination.drop("Label", axis=1, inplace=True)  # drop the labels from the dataset
+    return contamination, contaminationLabels
 
 
 if __name__ == "__main__": # this is just used to test the contamination function
