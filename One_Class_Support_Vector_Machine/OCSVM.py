@@ -4,6 +4,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import OneClassSVM
 
+import Evaluation
 import VNFDatasetLoader
 
 if __name__ == "__main__":
@@ -41,26 +42,4 @@ if __name__ == "__main__":
 
     predictions = ocsvm.predict(testingDataset)
 
-    print(roc_auc_score(testingLabels, predictions))  # print AUROC score
-    print("number of 'Benign' predictions: ", list(predictions).count(1))
-    print("number of 'anomaly' predictions: ", list(predictions).count(-1))
-
-    # this next section creates a confusion matrix for the results
-    truePositiveCount = 0
-    falsePositiveCount = 0
-    trueNegativeCount = 0
-    falseNegativeCount = 0
-    counter = 0
-    for pred in predictions:  # 1 indicates normal and -1 indicates anomaly
-        if testingLabels[counter] == "Benign" and pred == 1:
-            truePositiveCount += 1
-        elif testingLabels[counter] == "Benign" and pred == -1:
-            falsePositiveCount += 1
-        elif testingLabels[counter] != "Benign" and pred == 1:
-            falseNegativeCount += 1
-        else:
-            trueNegativeCount += 1
-        counter += 1
-
-    print("confusion matrix:")
-    print(f"{truePositiveCount}\t {falseNegativeCount} \n {falsePositiveCount} \t {trueNegativeCount}")
+    Evaluation.evaluate_model(testingLabels, predictions)
