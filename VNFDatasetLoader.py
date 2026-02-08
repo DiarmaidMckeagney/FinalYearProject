@@ -2,6 +2,8 @@ import os
 import random
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
 
 def get_file_paths():
     # this function gets all the filepaths in the VNF_Dataset folder.
@@ -109,6 +111,14 @@ def import_training_and_testing_data():
     print(testingDataset.shape)
 
     return fullDataset, fullLabels, testingDataset, testingLabels
+
+
+def run_label_encoding(dataset):
+    for col in dataset.select_dtypes(include=['object']).columns: # use label encoding to encode any non-numeric column
+        labelEncoder = LabelEncoder()
+        dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str))
+
+    return dataset
 
 if __name__ == "__main__": # this is just used to test the contamination function
     files = get_file_paths()
