@@ -24,22 +24,23 @@ def evaluate_model(labels, predictions):
         counter += 1
 
     print("confusion matrix:")
-    print(f"{truePositiveCount}\t {falsePositiveCount} \n {falseNegativeCount} \t {trueNegativeCount}")
+    print(f'\tAnomaly\tBenign')
+    print(f"Anomaly {truePositiveCount}\t{falsePositiveCount} \n Benign {falseNegativeCount}\t{trueNegativeCount}")
 
     f1_score_of_model = (2 * truePositiveCount) / (2 * truePositiveCount + falsePositiveCount + falseNegativeCount)
     print("F1 Score: ", f1_score_of_model)
 
-    precision_of_model = truePositiveCount / (truePositiveCount + falsePositiveCount)
+    precision_of_model = truePositiveCount / (truePositiveCount + falsePositiveCount) if (truePositiveCount + falsePositiveCount) > 0 else 0
     print("Precision: ", precision_of_model)
 
-    recall_of_model = truePositiveCount / (truePositiveCount + falseNegativeCount)
+    recall_of_model = truePositiveCount / (truePositiveCount + falseNegativeCount) if (truePositiveCount + falseNegativeCount) > 0 else 0
     print("Recall: ", recall_of_model)
 
-    true_negative_rate = trueNegativeCount / (trueNegativeCount + falsePositiveCount)
+    true_negative_rate = trueNegativeCount / (trueNegativeCount + falsePositiveCount) if (trueNegativeCount + falsePositiveCount) > 0 else 0
     print("True Negative Rate: ", true_negative_rate)
 
-    false_negetive_rate = falseNegativeCount / (falseNegativeCount + truePositiveCount)
+    false_negetive_rate = falseNegativeCount / (falseNegativeCount + truePositiveCount) if (falseNegativeCount + truePositiveCount) > 0 else 0
     print("False Negative Rate: ", false_negetive_rate)
 
-    false_positive_rate = falsePositiveCount / (falsePositiveCount + trueNegativeCount)
+    false_positive_rate = falsePositiveCount / (falsePositiveCount + trueNegativeCount) if (falsePositiveCount + trueNegativeCount) > 0 else 0
     print("False Positive Rate: ", false_positive_rate)
