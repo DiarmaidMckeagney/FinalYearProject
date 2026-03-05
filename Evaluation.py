@@ -2,7 +2,7 @@ from sklearn.metrics import roc_auc_score
 
 
 def evaluate_model(labels, predictions):
-    print("AUC ROC Score: ",roc_auc_score(labels, predictions, multi_class="ovo"))  # print AUROC score
+    #print("AUC ROC Score: ",roc_auc_score(labels, predictions, multi_class="ovo"))  # print AUROC score
     print("number of 'Benign' predictions: ", list(predictions).count(1))
     print("number of 'anomaly' predictions: ", list(predictions).count(-1))
 
@@ -16,17 +16,17 @@ def evaluate_model(labels, predictions):
         if labels[counter] != "Benign" and pred == -1:
             truePositiveCount += 1
         elif labels[counter] != "Benign" and pred == 1:
-            falsePositiveCount += 1
-        elif labels[counter] == "Benign" and pred == -1:
             falseNegativeCount += 1
+        elif labels[counter] == "Benign" and pred == -1:
+            falsePositiveCount += 1
         else:
             trueNegativeCount += 1
         counter += 1
 
     print("confusion matrix:")
-    print(f'\tAnomaly\tBenign')
-    print(f"Anomaly {truePositiveCount}\t{falsePositiveCount} \n Benign {falseNegativeCount}\t{trueNegativeCount}")
-
+    print("\t\t Actual Values")
+    print(f'\t\tAnomaly\tBenign')
+    print(f"Anomaly {truePositiveCount}\t{falsePositiveCount}\t Predicted \nBenign {falseNegativeCount}\t{trueNegativeCount}\t values")
     f1_score_of_model = (2 * truePositiveCount) / (2 * truePositiveCount + falsePositiveCount + falseNegativeCount)
     print("F1 Score: ", f1_score_of_model)
 

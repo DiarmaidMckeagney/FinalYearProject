@@ -4,7 +4,7 @@ import Evaluation
 
 def run_robust_covariance(trainingDataset, testingDataset, testingLabels):
 
-    robustCovariance = EllipticEnvelope(contamination=0.05) # create model
+    robustCovariance = EllipticEnvelope(contamination=0.05,support_fraction= 0.6,random_state=87248935) # create model
     robustCovariance.fit(trainingDataset) # train the model
 
     print(np.unique(testingLabels, return_counts=True))

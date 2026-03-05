@@ -9,8 +9,13 @@ def run_models():
     trainingDataset = VNFDatasetLoader.run_label_encoding(trainingDataset)
     testingDataset = VNFDatasetLoader.run_label_encoding(testingDataset)
 
+    print("Running Isolation Forest")
     IsolationForest.run_isolation_forest(trainingDataset, testingDataset, testingLabels)
+
+    print("\nRunning OCSVM")
     OCSVM.run_ocsvm(trainingDataset, testingDataset, testingLabels)
+
+    print("\nRunning Robust Covariance")
     RobustCovariance.run_robust_covariance(trainingDataset, testingDataset, testingLabels)
 
 

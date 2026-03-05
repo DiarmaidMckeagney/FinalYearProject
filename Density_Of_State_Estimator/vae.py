@@ -43,7 +43,7 @@ class FCDecoder(nn.Module):
 class EmbeddingEncoder(nn.Module):
     def __init__(self, input_size, latent_size, hidden_size):
         super().__init__()
-        self.embeddings = nn.ModuleList(nn.Embedding(num_embeddings, hidden_size // len(input_size)) for num_embeddings in input_size)
+        self.embeddings = nn.ModuleList(nn.Embedding(int(num_embeddings.item()), hidden_size // len(input_size)) for num_embeddings in input_size)
         self.fc2 = nn.Linear(len(input_size) * (hidden_size // len(input_size)), 2 * latent_size)
 
     def forward(self, x):

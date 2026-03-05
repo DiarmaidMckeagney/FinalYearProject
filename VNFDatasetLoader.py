@@ -118,15 +118,14 @@ def run_label_encoding(dataset):
         labelEncoder = LabelEncoder()
         dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str))
 
+    dataset.drop(["Start Time","Stop Time","Src Bytes","Dst Bytes"], axis=1, inplace=True)
+    #"Src data bytes","Dst data bytes","Session Segments"
+    print(dataset.dtypes)
     return dataset
 
 if __name__ == "__main__": # this is just used to test the contamination function
-    files = get_file_paths()
-    print(files)
-    trainingDataFiles = get_first_sessions(files)
-
-    trainingDataFiles.append(files[2]) # this is also done in main. It excludes the testing dataset from the contamination. In the actual code the training datasets are imported first before this is called.
-    trainingDataFiles.append(files[3])
-
-    contaminate = add_contamination(files, trainingDataFiles, 60_000)
-    print(contaminate)
+    trData,trLabels,tesData,tesLabels = import_training_and_testing_data()
+    tesData = run_label_encoding(tesData)
+    pd.set_option('display.max_columns', None)
+    print(tesData)
+    print(tesLabels)

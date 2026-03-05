@@ -4,7 +4,7 @@ import Evaluation
 
 def run_isolation_forest(trainingDataset, testingDataset, testingLabels):
 
-    isolationForest = IsolationForest(n_estimators=200, max_features=6, contamination=0.05, random_state=380)  # create model
+    isolationForest = IsolationForest(contamination=0.05,random_state=56)  # create model
     isolationForest.fit(trainingDataset)  # train model
 
     print(np.unique(testingLabels, return_counts=True))
