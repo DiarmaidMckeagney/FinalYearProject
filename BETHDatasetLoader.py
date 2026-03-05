@@ -52,7 +52,7 @@ def get_datasets():
     return trainingDataset, trainingLabels, validationDataset, validationLabels, testingDataset, testingLabels
 
 def extract_labels(dataset):
-     return dataset.iloc[:, -2:].values # getting the last two columns of the dataset (the labels)
+     return dataset.iloc[:, -2].values # getting the last two columns of the dataset (the labels)
 
 def process_dataset_columns(dataset):
     # This line is performing an operation on the processId column.

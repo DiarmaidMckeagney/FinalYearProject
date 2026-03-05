@@ -9,16 +9,16 @@ from Robust_Covariance import RobustCovariance
 from Density_Of_State_Estimator import DoseAndVae
 
 def run_models():
-    # trainingDataset, trainingLabels, validationDataset, validationLabels, testingDataset, testingLabels = BETHDatasetLoader.get_datasets()
-    #
-    # print("\nRunning Isolation Forest")
-    # IsolationForest.run_isolation_forest(trainingDataset, testingDataset, testingLabels)
-    #
-    # print("\nRunning OCSVM")
-    # OCSVM.run_ocsvm(trainingDataset, testingDataset, testingLabels)
-    #
-    # print("\nRunning Robust Covariance")
-    # RobustCovariance.run_robust_covariance(trainingDataset, testingDataset, testingLabels)
+    trainingDataset, trainingLabels, validationDataset, validationLabels, testingDataset, testingLabels = BETHDatasetLoader.get_datasets()
+
+    print("\nRunning Isolation Forest")
+    IsolationForest.run_isolation_forest(trainingDataset, testingDataset, testingLabels,True)
+
+    print("\nRunning OCSVM")
+    OCSVM.run_ocsvm(trainingDataset, testingDataset, testingLabels,True)
+
+    print("\nRunning Robust Covariance")
+    RobustCovariance.run_robust_covariance(trainingDataset, testingDataset, testingLabels,True)
 
     print("running DOSE + VAE model")
 

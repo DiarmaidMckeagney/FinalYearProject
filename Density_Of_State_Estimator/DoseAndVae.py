@@ -53,21 +53,6 @@ def train_vae(epoch, data_loader, model, prior, optimiser, device):
     train_loss = 0
     for i, (x, y) in enumerate(tqdm.tqdm(data_loader, leave=False)):
         x, y = x.to(device=device, non_blocking=True), y.to(device=device, non_blocking=True)
-
-        # Debug: Check first batch
-        if i == 0:
-            print(f"\nFirst batch shape: {x.shape}")
-            print(f"First batch min values per column: {x.min(dim=0)[0]}")
-            print(f"First batch max values per column: {x.max(dim=0)[0]}")
-            print(f"Expected num_classes from model: {model.input_shape}")
-
-            # Check if any value exceeds its expected range
-            for col_idx in range(x.size(1)):
-                col_max = x[:, col_idx].max().item()
-                expected_max = model.input_shape[col_idx].item() - 1
-                if col_max > expected_max:
-                    print(f"ERROR: Column {col_idx} has value {col_max} but expected max is {expected_max}")
-
         observation, posterior, z = model(x)
         loss = -observation.log_prob(x) + kl_divergence(z, posterior, prior)
         loss = -torch.logsumexp(-loss.view(loss.size(0), -1), dim=1).mean() - log(1)
@@ -102,10 +87,5 @@ def test_vae(seed, train_dataset):
 def get_input_shape(dataset):  # note that does not return actual shape, but is used to configure model for categorical data
     num_classes = dataset.data.max(dim=0)[0].long() + 1
 
-    # Debug: Print actual max values before any manual overrides
-    print("Actual max values per column:", dataset.data.max(dim=0)[0])
-    print("Calculated num_classes before override:", num_classes)
-
     num_classes[5] = 1011  # Manually set eventId range as 0-1011 (1010 is max value)
-    print("Input size after override: ", num_classes)
     return num_classes
