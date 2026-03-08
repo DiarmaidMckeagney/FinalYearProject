@@ -1,15 +1,10 @@
 from sklearn.metrics import roc_auc_score
 
 
-def evaluate_model(labels, predictions, isBeth):
+def evaluate_model(labels, predictions):
     #print("AUC ROC Score: ",roc_auc_score(labels, predictions, multi_class="ovo"))  # print AUROC score
     print("number of 'Benign' predictions: ", list(predictions).count(1))
     print("number of 'anomaly' predictions: ", list(predictions).count(-1))
-
-    if isBeth:
-        labelBenign = 0
-    else:
-        labelBenign = "Benign"
 
     # this next section creates a confusion matrix for the results
     truePositiveCount = 0
@@ -18,11 +13,11 @@ def evaluate_model(labels, predictions, isBeth):
     falseNegativeCount = 0
     counter = 0
     for pred in predictions:  # 1 indicates normal and -1 indicates anomaly
-        if labels[counter] != labelBenign and pred == -1:
+        if labels[counter] != 0 and pred == -1:
             truePositiveCount += 1
-        elif labels[counter] != labelBenign and pred == 1:
+        elif labels[counter] != 0 and pred == 1:
             falseNegativeCount += 1
-        elif labels[counter] == labelBenign and pred == -1:
+        elif labels[counter] == 0 and pred == -1:
             falsePositiveCount += 1
         else:
             trueNegativeCount += 1

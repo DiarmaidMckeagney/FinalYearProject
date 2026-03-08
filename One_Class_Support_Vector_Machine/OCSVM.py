@@ -3,7 +3,7 @@ from sklearn.linear_model import SGDOneClassSVM
 
 import Evaluation
 
-def run_ocsvm(trainingDataset, testingDataset, testingLabels,isBeth):
+def run_ocsvm(trainingDataset, testingDataset, testingLabels):
 
     ocsvm = SGDOneClassSVM(max_iter=3_000,random_state=10) # creating the OCSVM
     ocsvm.fit(trainingDataset) # training the model
@@ -12,4 +12,4 @@ def run_ocsvm(trainingDataset, testingDataset, testingLabels,isBeth):
 
     predictions = ocsvm.predict(testingDataset)
 
-    Evaluation.evaluate_model(testingLabels, predictions,isBeth)
+    Evaluation.evaluate_model(testingLabels, predictions)

@@ -2,7 +2,9 @@ import os
 import random
 import pandas as pd
 import numpy as np
+import torch
 from sklearn.preprocessing import LabelEncoder
+from torch.utils.data import TensorDataset
 
 
 def get_file_paths():
@@ -49,8 +51,8 @@ def import_dataset_from_files(filePaths):
     fullDataset = pd.concat(dataset) # this merges all the data from each file into one dataframe
 
     numberOfAnomaliesNeeded = round((float(fullDataset.shape[0]) / 95.0) * 5.0)
-
-    datasetLabels = fullDataset.iloc[:, fullDataset.shape[1] - 1].values # separate out the labels
+    fullDataset.iloc[:, fullDataset.shape[1] - 1] = (fullDataset.iloc[:, fullDataset.shape[1] - 1] != "Benign").astype(int)
+    datasetLabels = fullDataset.iloc[:, fullDataset.shape[1] - 1].astype('int64').values  # separate out the labels
     fullDataset.drop("Label", axis=1, inplace=True) # drop the labels from the dataset
 
     return fullDataset, datasetLabels, numberOfAnomaliesNeeded # return dataset and labels
@@ -61,13 +63,14 @@ def add_contamination(filesToUse, filesNotToUse, contaminationAmount):
 
     for file in filesToUse:
         if contamination.shape[0] >= contaminationAmount: # if we have enough
-            contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].values  # separate out the labels
+            contamination.iloc[:, contamination.shape[1] - 1] = (contamination.iloc[:, contamination.shape[1] - 1] != "Benign").astype("int64")
+            contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].astype("int64").values  # separate out the labels
             contamination.drop("Label", axis=1, inplace=True)  # drop the labels from the dataset
             return contamination, contaminationLabels
 
         if file in filesNotToUse: # we are skipping any files used in the training and testing datasets
             continue
-
+        print(file)
         datasetContamination = pd.read_csv(file, header=0, low_memory=False, encoding="utf-8",on_bad_lines="skip", skipinitialspace=True) # read in file
         datasetContamination.dropna(axis=0, how='all', inplace=True) # remove null rows
         datasetContamination.drop(datasetContamination[datasetContamination["Label"] == "Benign"].index, axis=0, inplace=True) # drop benign data
@@ -81,7 +84,8 @@ def add_contamination(filesToUse, filesNotToUse, contaminationAmount):
         contamination = pd.concat([contamination,datasetContamination.iloc[0:amountStillNeeded,:]]) # add the remaining amount of samples needed.
 
     # If somehow we get to the end of the all the files and still don't have enough, then return what we have
-    contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].values  # separate out the labels
+    contamination.iloc[:, contamination.shape[1] - 1] = (contamination.iloc[:, contamination.shape[1] - 1] != "Benign").astype("int64")
+    contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].astype("int64").values  # separate out the labels
     contamination.drop("Label", axis=1, inplace=True)  # drop the labels from the dataset
 
     return contamination, contaminationLabels
@@ -95,20 +99,17 @@ def import_training_and_testing_data():
 
     # these next two lines are added so that the testing data is not added to the training data.
     trainingFiles.append(files[2])
-    trainingFiles.append(files[3])
+    trainingFiles.append(files[4])
 
     anomalyData, anomalyLabels = add_contamination(files.copy(), trainingFiles, numAnomalies)
 
     fullDataset = pd.concat([dataset, anomalyData])
-    fullLabels = np.append(labels, anomalyLabels)
+    fullLabels = np.append(labels, anomalyLabels).astype("int64")
 
     fullDataset.dropna(axis=1, how="any", inplace=True)
-    print(fullDataset.shape)
 
-    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files([files[2], files[3]])  # load some test data
+    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files([files[2], files[4]])  # load some test data
     testingDataset.dropna(axis=1, how="any", inplace=True)
-
-    print(testingDataset.shape)
 
     return fullDataset, fullLabels, testingDataset, testingLabels
 
@@ -116,16 +117,27 @@ def import_training_and_testing_data():
 def run_label_encoding(dataset):
     for col in dataset.select_dtypes(include=['object']).columns: # use label encoding to encode any non-numeric column
         labelEncoder = LabelEncoder()
-        dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str))
+        dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str)).astype("float64")
 
     dataset.drop(["Start Time","Stop Time","Src Bytes","Dst Bytes"], axis=1, inplace=True)
     #"Src data bytes","Dst data bytes","Session Segments"
-    print(dataset.dtypes)
     return dataset
 
-if __name__ == "__main__": # this is just used to test the contamination function
-    trData,trLabels,tesData,tesLabels = import_training_and_testing_data()
-    tesData = run_label_encoding(tesData)
-    pd.set_option('display.max_columns', None)
-    print(tesData)
-    print(tesLabels)
+class VNFDataset(TensorDataset):
+    def __init__(self, split="train"):
+        trData, trLabels, tesData, tesLabels = import_training_and_testing_data()
+        if split == 'train':
+            data = trData
+            labels = trLabels
+        elif split == 'test':
+            data = tesData
+            labels = tesLabels
+        else:
+            raise Exception("Error: Invalid 'split' given")
+
+        data = run_label_encoding(data)
+        print(labels.ctypes)
+
+        self.data = torch.as_tensor(data.values, dtype=torch.int64)
+        self.labels = torch.as_tensor(labels, dtype=torch.int64)
+        super().__init__(self.data, self.labels)
