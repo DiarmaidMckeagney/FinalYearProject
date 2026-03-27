@@ -1,8 +1,6 @@
 import os
 import pandas as pd
-import torch
 from sklearn.preprocessing import LabelEncoder
-from torch.utils.data import TensorDataset
 
 
 def get_file_paths():
