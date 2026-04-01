@@ -1,4 +1,8 @@
 import numpy as np
+import pandas as pd
+
+import VNFDatasetLoader
+
 
 # this file is used to perform any manual processing of dataset files that I need to do
 

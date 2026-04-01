@@ -45,8 +45,6 @@ def get_datasets():
     testingDataset = process_dataset_columns(testingDataset)
 
     pd.set_option('display.max_columns', None)
-    print(trainingDataset.head())
-
     return trainingDataset, trainingLabels, validationDataset, validationLabels, testingDataset, testingLabels
 
 def extract_labels(dataset):
@@ -80,24 +78,3 @@ def process_dataset_columns(dataset):
     dataset.drop(["timestamp","threadId","hostName","eventName","stackAddresses", "args"], axis=1, inplace=True)
     return dataset
 
-class BETHDataset(TensorDataset):
-    """
-    Data collected from BETH (honeypots) and setup for unsupervised training and testing.
-    """
-    def __init__(self, split='train', subsample=0):
-        trData,trLabels,valData,valLabels,tesData,tesLabels = get_datasets()
-        if split == 'train':
-            data = trData
-            labels = trLabels
-        elif split == 'val':
-            data = valData
-            labels = valLabels
-        elif split == 'test':
-            data = tesData
-            labels = tesLabels
-        else:
-            raise Exception("Error: Invalid 'split' given")
-
-        self.data = torch.as_tensor(data.values, dtype=torch.int64)
-        self.labels = torch.as_tensor(labels, dtype=torch.int64)
-        super().__init__(self.data, self.labels)

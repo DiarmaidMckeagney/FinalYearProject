@@ -1,6 +1,6 @@
 import csv
 
-def evaluate_model(labels, predictions, fileToWriteTo, isStart, feature):
+def evaluate_feature_selection_model(labels, predictions, fileToWriteTo, isStart, feature):
     print("number of 'Benign' predictions: ", list(predictions).count(1))
     print("number of 'anomaly' predictions: ", list(predictions).count(-1))
 
@@ -32,7 +32,7 @@ def run_calculations(labels, predictions,isStart,fileToWriteTo):
     defaultRecall = 0
     defaultTrueNegativeRate = 0
 
-    if not isStart:
+    if not isStart and fileToWriteTo is not None:
         with open(fileToWriteTo, "r") as csvfile:
             defaultReader = csv.reader(csvfile, delimiter=',')
             next(defaultReader)  # skip headers
@@ -74,5 +74,39 @@ def run_calculations(labels, predictions,isStart,fileToWriteTo):
 
     return truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model,precision_of_model,recall_of_model,true_negative_rate,false_negative_rate,false_positive_rate,changeInRecall,changeInTrueNegativeRate,totalChangeInAccuracy
 
-def evaluate_hyper_model():
-    print("hello")
+def evaluate_hyper_model(labels, predictions, isStart, fileToWriteTo, config):
+    truePositiveCount, trueNegativeCount, falsePositiveCount, falseNegativeCount, f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy = run_calculations(labels, predictions, isStart, fileToWriteTo)
+
+    with open(fileToWriteTo, "a") as csvfile:
+        ws = csv.writer(csvfile, delimiter=',')
+        if isStart:
+            titleString = [f"Config {i+1}" for i in range(len(config))]
+            titleString.extend([
+                "F1 Score", "Precision", "Recall", "True Negative Rate",
+                "False Negative Rate", "False Positive Rate",
+                "Change in Recall from Default", "Change in TNR from Default",
+                "Total Change in Accuracy"
+            ])
+            ws.writerow(titleString)
+
+        dataRow = list(config)
+        dataRow.extend([f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate,false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy])
+
+        ws.writerow(dataRow)
+
+def final_eval_model(labels, predictions):
+    truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy = run_calculations(labels,predictions,True,None)
+
+    print("number of 'Benign' predictions: ", list(predictions).count(1))
+    print("number of 'anomaly' predictions: ", list(predictions).count(-1))
+    print("confusion matrix:")
+    print("\t\t Actual Values")
+    print(f'\t\tAnomaly\tBenign')
+    print(
+        f"Anomaly {truePositiveCount}\t{falsePositiveCount}\t Predicted \nBenign {falseNegativeCount}\t{trueNegativeCount}\t values")
+    print("F1 Score: ", f1_score_of_model)
+    print("Precision: ", precision_of_model)
+    print("Recall: ", recall_of_model)
+    print("True Negative Rate: ", true_negative_rate)
+    print("False Negative Rate: ", false_negative_rate)
+    print("False Positive Rate: ", false_positive_rate)

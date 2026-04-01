@@ -25,7 +25,8 @@ def get_first_sessions(filePaths):
     #this function is used to get the filepaths to first session from each VNF service. I am doing this because the first sessions have only benign data.
     trainingFiles = []
     contaminationFiles = []
-    testingFiles = []
+    validationFiles = []
+    finalTestFiles = []
 
     for file in filePaths:
         # this block goes through each path and gets the session number of the file.
@@ -40,8 +41,10 @@ def get_first_sessions(filePaths):
         elif int(session_number) == 2:
             contaminationFiles.append(file)
         elif int(session_number) == 3:
-            testingFiles.append(file)
-    return trainingFiles, contaminationFiles, testingFiles
+            validationFiles.append(file)
+        elif int(session_number) == 4 or int(session_number) == 5:
+            finalTestFiles.append(file)
+    return trainingFiles, contaminationFiles, validationFiles, finalTestFiles
 
 
 def import_dataset_from_files(filePaths):
@@ -55,8 +58,8 @@ def import_dataset_from_files(filePaths):
     fullDataset = pd.concat(dataset) # this merges all the data from each file into one dataframe
 
     numberOfAnomaliesNeeded = round((float(fullDataset.shape[0]) / 95.0) * 5.0)
-    fullDataset.iloc[:, fullDataset.shape[1] - 1] = (fullDataset.iloc[:, fullDataset.shape[1] - 1] != "Benign").astype(int)
-    datasetLabels = fullDataset.iloc[:, fullDataset.shape[1] - 1].astype('int64').values  # separate out the labels
+    fullDataset["Label"] = (fullDataset["Label"] != "Benign").astype(int)
+    datasetLabels = fullDataset["Label"].astype('int64').values  # separate out the labels
     fullDataset.drop("Label", axis=1, inplace=True) # drop the labels from the dataset
 
     return fullDataset, datasetLabels, numberOfAnomaliesNeeded # return dataset and labels
@@ -83,7 +86,7 @@ def add_contamination(filesToUse, contaminationAmount):
 
 def import_training_and_testing_data():
     files = get_file_paths()  # read in filepaths
-    trainingFiles, contamFiles, testFiles = get_first_sessions(files)  # get the first sessions to be used as the training data
+    trainingFiles, contamFiles, valFiles, testFiles = get_first_sessions(files)  # get the first sessions to be used as the training data
 
     dataset, labels, numAnomalies = import_dataset_from_files(trainingFiles)  # import the dataset
 
@@ -91,13 +94,23 @@ def import_training_and_testing_data():
 
     fullDataset = pd.concat([dataset, anomalyData])
     fullLabels = np.append(labels, anomalyLabels).astype("int64")
-
     fullDataset.dropna(axis=1, how="any", inplace=True)
 
-    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files(testFiles)  # load some test data
+    validationDataset, validationLabels, valNumAnomalies = import_dataset_from_files(valFiles)  # load some test data
+    validationDataset.dropna(axis=1, how="any", inplace=True)
+
+    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files(testFiles)
+    fill_values = {
+        "Dst IP": "0.0.0.0",
+        "Src IP": "0.0.0.0",
+        "Dst Port": 0,
+        "Src Port": 0
+    }
+    testingDataset.fillna(value=fill_values, inplace=True)
+    testingDataset.drop(["Unnamed: 41"], axis=1, inplace=True)
     testingDataset.dropna(axis=1, how="any", inplace=True)
 
-    return fullDataset, fullLabels, testingDataset, testingLabels
+    return fullDataset, fullLabels, validationDataset, validationLabels, testingDataset, testingLabels
 
 
 def run_label_encoding(dataset):
@@ -105,5 +118,8 @@ def run_label_encoding(dataset):
         labelEncoder = LabelEncoder()
         dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str)).astype("float64")
 
-    dataset.drop(["Start Time","Stop Time"], axis=1, inplace=True)
+    if "Start Time" in dataset.columns:
+        dataset.drop(["Start Time"], axis=1, inplace=True)
+    if "Stop Time" in dataset.columns:
+        dataset.drop(["Stop Time"], axis=1, inplace=True)
     return dataset
