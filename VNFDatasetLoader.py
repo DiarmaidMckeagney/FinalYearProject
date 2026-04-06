@@ -21,12 +21,12 @@ def get_file_paths():
     return filepaths
 
 
-def get_first_sessions(filePaths):
-    #this function is used to get the filepaths to first session from each VNF service. I am doing this because the first sessions have only benign data.
-    trainingFiles = []
-    contaminationFiles = []
-    validationFiles = []
-    finalTestFiles = []
+def get_sessions(filePaths):
+    #this function takes the filepaths and separates the sessions from each VNF service into different arrays.
+    trainingFiles = [] #all session 1's
+    contaminationFiles = []#all session 2's
+    validationFiles = []#all session 3's
+    finalTestFiles = []#all session 4's
 
     for file in filePaths:
         # this block goes through each path and gets the session number of the file.
@@ -38,11 +38,11 @@ def get_first_sessions(filePaths):
         # now it checks if the session number is 1 and if so, appends it to the trainingFiles list
         if int(session_number) == 1:
             trainingFiles.append(file)
-        elif int(session_number) == 2:
+        elif int(session_number) == 2: # if 2, append to contamination list
             contaminationFiles.append(file)
-        elif int(session_number) == 3:
+        elif int(session_number) == 3: # if 3, append to validation list
             validationFiles.append(file)
-        elif int(session_number) == 4 or int(session_number) == 5:
+        elif int(session_number) == 4 or int(session_number) == 5: # if 4 or 5, append to test list
             finalTestFiles.append(file)
     return trainingFiles, contaminationFiles, validationFiles, finalTestFiles
 
@@ -50,15 +50,15 @@ def get_first_sessions(filePaths):
 def import_dataset_from_files(filePaths):
     dataset = []
 
-    for file in filePaths:
-        datasetFrame = pd.read_csv(file, header=0, low_memory=False, encoding="utf-8", on_bad_lines="skip", skipinitialspace=True) #read in each file
+    for file in filePaths: #reads in each file
+        datasetFrame = pd.read_csv(file, header=0, low_memory=False, encoding="utf-8", on_bad_lines="skip", skipinitialspace=True) #read into dataframe
         datasetFrame.dropna(axis=0, how='all', inplace=True) # This drops any rows that have no values
         dataset.append(datasetFrame) # add the dataframe to the array of all dataframes
 
     fullDataset = pd.concat(dataset) # this merges all the data from each file into one dataframe
 
-    numberOfAnomaliesNeeded = round((float(fullDataset.shape[0]) / 95.0) * 5.0)
-    fullDataset["Label"] = (fullDataset["Label"] != "Benign").astype(int)
+    numberOfAnomaliesNeeded = round((float(fullDataset.shape[0]) / 95.0) * 5.0) #calculates the number of samples needing to be added to have 5% contamination
+    fullDataset["Label"] = (fullDataset["Label"] != "Benign").astype(int) # converts the labels into 0 or 1 depending on type.
     datasetLabels = fullDataset["Label"].astype('int64').values  # separate out the labels
     fullDataset.drop("Label", axis=1, inplace=True) # drop the labels from the dataset
 
@@ -68,16 +68,16 @@ def import_dataset_from_files(filePaths):
 
 def add_contamination(filesToUse, contaminationAmount):
     contamination = pd.DataFrame() # used to hold the contamination dataframe to be returned
-    perFileCount = math.floor(contaminationAmount / 5)
+    perFileCount = math.floor(contaminationAmount / 5)# want an even amount of samples from each file.
 
     for file in filesToUse:
         datasetContamination = pd.read_csv(file, header=0, low_memory=False, encoding="utf-8",on_bad_lines="skip", skipinitialspace=True) # read in file
         datasetContamination.dropna(axis=0, how='all', inplace=True) # remove null rows
         datasetContamination.drop(datasetContamination[datasetContamination["Label"] == "Benign"].index, axis=0, inplace=True) # drop benign data
 
-        contamination = pd.concat([contamination,datasetContamination.iloc[0:perFileCount,:]]) # add the remaining amount of samples needed.
+        contamination = pd.concat([contamination,datasetContamination.iloc[0:perFileCount,:]]) # add the amount of samples needed.
 
-    contamination.iloc[:, contamination.shape[1] - 1] = (contamination.iloc[:, contamination.shape[1] - 1] != "Benign").astype("int64")
+    contamination.iloc[:, contamination.shape[1] - 1] = (contamination.iloc[:, contamination.shape[1] - 1] != "Benign").astype("int64") #converting the labels to 0 or 1
     contaminationLabels = contamination.iloc[:, contamination.shape[1] - 1].astype("int64").values  # separate out the labels
     contamination.drop("Label", axis=1, inplace=True)  # drop the labels from the dataset
 
@@ -86,29 +86,29 @@ def add_contamination(filesToUse, contaminationAmount):
 
 def import_training_and_testing_data():
     files = get_file_paths()  # read in filepaths
-    trainingFiles, contamFiles, valFiles, testFiles = get_first_sessions(files)  # get the first sessions to be used as the training data
+    trainingFiles, contamFiles, valFiles, testFiles = get_sessions(files)  # get the sessions to be used as the training/val/test data
 
-    dataset, labels, numAnomalies = import_dataset_from_files(trainingFiles)  # import the dataset
+    dataset, labels, numAnomalies = import_dataset_from_files(trainingFiles)  # import the datasets
 
-    anomalyData, anomalyLabels = add_contamination(contamFiles, numAnomalies)
+    anomalyData, anomalyLabels = add_contamination(contamFiles, numAnomalies)#get contamination
 
-    fullDataset = pd.concat([dataset, anomalyData])
-    fullLabels = np.append(labels, anomalyLabels).astype("int64")
-    fullDataset.dropna(axis=1, how="any", inplace=True)
+    fullDataset = pd.concat([dataset, anomalyData]) #merge the contamination into the training dataset
+    fullLabels = np.append(labels, anomalyLabels).astype("int64")#merge the contamination labels into the training labels
+    fullDataset.dropna(axis=1, how="any", inplace=True)# drop columns that contain null values
 
-    validationDataset, validationLabels, valNumAnomalies = import_dataset_from_files(valFiles)  # load some test data
-    validationDataset.dropna(axis=1, how="any", inplace=True)
+    validationDataset, validationLabels, valNumAnomalies = import_dataset_from_files(valFiles)  # load validation data
+    validationDataset.dropna(axis=1, how="any", inplace=True)# drop columns that contain null values
 
-    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files(testFiles)
-    fill_values = {
-        "Dst IP": "0.0.0.0",
+    testingDataset, testingLabels, testNumAnomalies = import_dataset_from_files(testFiles)# load testing data
+    fill_values = { # I was running into issues with the quality of the testing datasets and was not able to resolve it manually.
+        "Dst IP": "0.0.0.0", # these values will be used to fill in the missing values in these files. I believe it is only one or two rows per feature.
         "Src IP": "0.0.0.0",
         "Dst Port": 0,
         "Src Port": 0
     }
     testingDataset.fillna(value=fill_values, inplace=True)
-    testingDataset.drop(["Unnamed: 41"], axis=1, inplace=True)
-    testingDataset.dropna(axis=1, how="any", inplace=True)
+    testingDataset.drop(["Unnamed: 41"], axis=1, inplace=True)# I tried to remove this manually but it kept coming back so I am just dropping it everytime instead.
+    testingDataset.dropna(axis=1, how="any", inplace=True) # drop columns that contain null values
 
     return fullDataset, fullLabels, validationDataset, validationLabels, testingDataset, testingLabels
 
@@ -118,6 +118,7 @@ def run_label_encoding(dataset):
         labelEncoder = LabelEncoder()
         dataset[col] = labelEncoder.fit_transform(dataset[col].astype(str)).astype("float64")
 
+    #removing the start and stop time columns
     if "Start Time" in dataset.columns:
         dataset.drop(["Start Time"], axis=1, inplace=True)
     if "Stop Time" in dataset.columns:

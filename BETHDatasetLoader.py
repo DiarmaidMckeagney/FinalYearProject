@@ -11,12 +11,12 @@ def get_file_paths():
     validationPath = os.path.join(dir_path,"labelled_validation_data.csv")
     testingPath = os.path.join(dir_path,"labelled_testing_data.csv")
 
-    return trainingPath, validationPath, testingPath
+    return trainingPath, validationPath, testingPath # returning the file paths of the datasets
 
 def import_dataset_from_files(filePaths):
     print("Importing dataset")
     trainingDataset = pd.read_csv(filePaths[0])
-    validationDataset = pd.read_csv(filePaths[1])
+    validationDataset = pd.read_csv(filePaths[1]) # reading the datasets into panda DataFrames
     testingDataset = pd.read_csv(filePaths[2])
 
     return trainingDataset, validationDataset, testingDataset
@@ -33,18 +33,17 @@ def get_datasets():
     trainingDataset, validationDataset, testingDataset = import_dataset_from_files(paths)
 
     trainingLabels = extract_labels(trainingDataset)
-    validationLabels = extract_labels(validationDataset)
+    validationLabels = extract_labels(validationDataset) #separating out the labels
     testingLabels = extract_labels(testingDataset)
 
     trainingDataset.drop(["sus","evil"], axis=1, inplace=True)
-    validationDataset.drop(["sus","evil"], axis=1, inplace=True)
+    validationDataset.drop(["sus","evil"], axis=1, inplace=True) # drop the labels
     testingDataset.drop(["sus","evil"], axis=1, inplace=True)
 
     trainingDataset = process_dataset_columns(trainingDataset)
-    validationDataset = process_dataset_columns(validationDataset)
+    validationDataset = process_dataset_columns(validationDataset) # processing the features
     testingDataset = process_dataset_columns(testingDataset)
 
-    pd.set_option('display.max_columns', None)
     return trainingDataset, trainingLabels, validationDataset, validationLabels, testingDataset, testingLabels
 
 def extract_labels(dataset):
@@ -66,15 +65,11 @@ def process_dataset_columns(dataset):
     # This value corresponds to the /mmt directory.
     dataset.iloc[:, 5] = (dataset.iloc[:, 5] == 4026531840).astype(int)
 
-    # This is for the processName. I am label encoding it to see if it can provide good results
-    labelEncoder = LabelEncoder()
-    dataset["processName"] = labelEncoder.fit_transform(dataset["processName"]).astype("int64")
-
     # This is for return value. I had to do the weird -0.01, 0.99 because otherwise it wouldn't put them in the correct bin.
     # Sorts the return values into negative, 0, and positive.
     dataset.iloc[:, 12] = pd.cut(dataset.iloc[:, 12],bins=[-float("inf"), -0.01, 0.99, float("inf")],labels=[0, 1, 2]).astype(int)
 
     # Removing other columns that are not needed.
-    dataset.drop(["timestamp","threadId","hostName","eventName","stackAddresses", "args"], axis=1, inplace=True)
+    dataset.drop(["timestamp","threadId","processName","hostName","eventName","stackAddresses", "args"], axis=1, inplace=True)
     return dataset
 

@@ -1,11 +1,13 @@
 import csv
+from sklearn.metrics import roc_auc_score
 
 def evaluate_feature_selection_model(labels, predictions, fileToWriteTo, isStart, feature):
     print("number of 'Benign' predictions: ", list(predictions).count(1))
     print("number of 'anomaly' predictions: ", list(predictions).count(-1))
 
-    truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy = run_calculations(labels,predictions,isStart,fileToWriteTo)
+    roc,truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInAUROC = run_calculations(labels,predictions,isStart,fileToWriteTo)
 
+    print("AUROC Score: ", roc)
     print("confusion matrix:")
     print("\t\t Actual Values")
     print(f'\t\tAnomaly\tBenign')
@@ -18,27 +20,26 @@ def evaluate_feature_selection_model(labels, predictions, fileToWriteTo, isStart
     print("False Positive Rate: ", false_positive_rate)
 
     if not isStart:
-        print("Change in Recall compared to Default Model: ", changeInRecall)
-        print("Change in True Negative Rate compared to Default Model: ", changeInTrueNegativeRate)
+        print("Change in AUROC compared to Default Model: ", changeInAUROC)
 
-    with open(fileToWriteTo,"a") as csvfile:
+    with open(fileToWriteTo,"a") as csvfile: # writing the results to the output file
         ws = csv.writer(csvfile, delimiter=',')
-        if isStart:
-            ws.writerow(["Feature Removed","F1 Score", "Precision", "Recall", "True Negative Rate", "False Negative Rate", "False Positive Rate","Change in Recall from Default","Change in TNR from Default", "Total Change in Accuracy"])
-        ws.writerow([feature, f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy])
+        if isStart: # writes the header once
+            ws.writerow(["Feature Removed","AUROC Score","F1 Score", "Precision", "Recall", "True Negative Rate", "False Negative Rate", "False Positive Rate"])
+        ws.writerow([feature,roc, f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInAUROC])
     csvfile.close()
 
 def run_calculations(labels, predictions,isStart,fileToWriteTo):
-    defaultRecall = 0
-    defaultTrueNegativeRate = 0
+    roc = 1 - roc_auc_score(labels,predictions)
+    defaultAUROC = 0
 
-    if not isStart and fileToWriteTo is not None:
+    if not isStart and fileToWriteTo is not None: # gets the AUROC score of the baseline model
         with open(fileToWriteTo, "r") as csvfile:
             defaultReader = csv.reader(csvfile, delimiter=',')
             next(defaultReader)  # skip headers
             defaultResults = next(defaultReader)
-            defaultRecall = float(defaultResults[3])
-            defaultTrueNegativeRate = float(defaultResults[4])
+            defaultAUROC = float(defaultResults[1])
+
         csvfile.close()
 
     truePositiveCount = 0
@@ -56,7 +57,7 @@ def run_calculations(labels, predictions,isStart,fileToWriteTo):
         else:
             trueNegativeCount += 1
         counter += 1
-
+    #calculate the various statistics on the models.
     f1_score_of_model = (2 * truePositiveCount) / (2 * truePositiveCount + falsePositiveCount + falseNegativeCount) if (2 * truePositiveCount + falsePositiveCount + falseNegativeCount) else 0
     precision_of_model = truePositiveCount / (truePositiveCount + falsePositiveCount) if (truePositiveCount + falsePositiveCount) > 0 else 0
     recall_of_model = truePositiveCount / (truePositiveCount + falseNegativeCount) if (truePositiveCount + falseNegativeCount) > 0 else 0
@@ -64,39 +65,35 @@ def run_calculations(labels, predictions,isStart,fileToWriteTo):
     false_negative_rate = falseNegativeCount / (falseNegativeCount + truePositiveCount) if (falseNegativeCount + truePositiveCount) > 0 else 0
     false_positive_rate = falsePositiveCount / (falsePositiveCount + trueNegativeCount) if (falsePositiveCount + trueNegativeCount) > 0 else 0
     if not isStart:
-        changeInRecall = recall_of_model - defaultRecall
-        changeInTrueNegativeRate = true_negative_rate - defaultTrueNegativeRate
-        totalChangeInAccuracy = changeInRecall + changeInTrueNegativeRate
+        changeInAUROC = roc - defaultAUROC # if not the default model, calculate the change in AUROC.
     else:
-        changeInRecall = 0
-        changeInTrueNegativeRate = 0
-        totalChangeInAccuracy = 0
+        changeInAUROC = 0
 
-    return truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model,precision_of_model,recall_of_model,true_negative_rate,false_negative_rate,false_positive_rate,changeInRecall,changeInTrueNegativeRate,totalChangeInAccuracy
+    return roc,truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model,precision_of_model,recall_of_model,true_negative_rate,false_negative_rate,false_positive_rate,changeInAUROC
 
 def evaluate_hyper_model(labels, predictions, isStart, fileToWriteTo, config):
-    truePositiveCount, trueNegativeCount, falsePositiveCount, falseNegativeCount, f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy = run_calculations(labels, predictions, isStart, fileToWriteTo)
+    roc,truePositiveCount, trueNegativeCount, falsePositiveCount, falseNegativeCount, f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInAUROC = run_calculations(labels, predictions, isStart, fileToWriteTo)
 
-    with open(fileToWriteTo, "a") as csvfile:
+    with open(fileToWriteTo, "a") as csvfile: # write the result of a hyperparametered run
         ws = csv.writer(csvfile, delimiter=',')
         if isStart:
             titleString = [f"Config {i+1}" for i in range(len(config))]
             titleString.extend([
-                "F1 Score", "Precision", "Recall", "True Negative Rate",
+                "AUROC Score","F1 Score", "Precision", "Recall", "True Negative Rate",
                 "False Negative Rate", "False Positive Rate",
-                "Change in Recall from Default", "Change in TNR from Default",
-                "Total Change in Accuracy"
+                "Change in AUROC"
             ])
             ws.writerow(titleString)
 
-        dataRow = list(config)
-        dataRow.extend([f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate,false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy])
+        dataRow = list(config)#adding the config list to the row
+        dataRow.extend([roc,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate,false_positive_rate, changeInAUROC])
 
         ws.writerow(dataRow)
 
 def final_eval_model(labels, predictions):
-    truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInRecall, changeInTrueNegativeRate, totalChangeInAccuracy = run_calculations(labels,predictions,True,None)
-
+    roc,truePositiveCount,trueNegativeCount,falsePositiveCount,falseNegativeCount,f1_score_of_model, precision_of_model, recall_of_model, true_negative_rate, false_negative_rate, false_positive_rate, changeInAUROC = run_calculations(labels,predictions,True,None)
+    #print the results
+    print("AUROC Score: ", roc)
     print("number of 'Benign' predictions: ", list(predictions).count(1))
     print("number of 'anomaly' predictions: ", list(predictions).count(-1))
     print("confusion matrix:")
